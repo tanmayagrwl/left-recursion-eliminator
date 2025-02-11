@@ -97,3 +97,4 @@ Follow the prompts to input the grammar rules.
 ### Conclusion
 This program provides a straightforward implementation of left recursion elimination in context-free grammars. It is useful for preparing grammars for use in top-down parsing algorithms, ensuring that they are free from left recursion.
 
+Credits- GFG (This code is a modified and more dynamic version of left recursion eliminator available on GFG)
