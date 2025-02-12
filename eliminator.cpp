@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+//  if this gives unwanted errors then use <bits/stdc++.h> instead of <vector> <string> <iostream>
 using namespace std;
 
 class NonTerminal {
