@@ -1,4 +1,6 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
 
 class NonTerminal {
@@ -67,31 +69,50 @@ public:
 
     // Adds a rule to the grammar
     void addRule(string rule) {
+        size_t arrowPos = rule.find("->"); // Find the position of "->"
+        if (arrowPos == string::npos) {
+            cout << "Invalid rule format: " << rule << endl;
+            return;
+        }
+    
+        // Extract the nonterminal (left-hand side)
+        string nonTerminal = rule.substr(0, arrowPos);
+        nonTerminal.erase(remove(nonTerminal.begin(), nonTerminal.end(), ' '), nonTerminal.end()); // Remove spaces
+    
+        // Extract the production rules (right-hand side)
+        string productions = rule.substr(arrowPos + 2);
+        productions.erase(remove(productions.begin(), productions.end(), ' '), productions.end()); // Remove spaces
+    
+        // Split the productions by '|'
+        vector<string> rules;
+        size_t start = 0;
+        size_t end = productions.find('|');
+        while (end != string::npos) {
+            rules.push_back(productions.substr(start, end - start));
+            start = end + 1;
+            end = productions.find('|', start);
+        }
+        rules.push_back(productions.substr(start)); // Add the last rule
+    
+        // Add the nonterminal and its rules to the grammar
         bool ntFound = false;
-        string parse = "";
-        // Parse the input rule string character by character.
-        // The first token is the nonterminal; subsequent tokens are production bodies.
-        for (char c : rule) {
-            if (c == ' ') {
-                if (!ntFound) {
-                    // First token is the nonterminal
-                    NonTerminal newNonTerminal(parse);
-                    nonTerminals.push_back(newNonTerminal);
-                    ntFound = true;
-                    parse = "";
-                } else if (!parse.empty()) {
-                    nonTerminals.back().addRule(parse);
-                    parse = "";
+        for (auto &nt : nonTerminals) {
+            if (nt.getName() == nonTerminal) {
+                ntFound = true;
+                for (auto &rule : rules) {
+                    nt.addRule(rule);
                 }
-            } else if (c != '|' && c != '-' && c != '>') {
-                parse += c;
+                break;
             }
         }
-        if (!parse.empty()){
-            nonTerminals.back().addRule(parse);
+        if (!ntFound) {
+            NonTerminal newNT(nonTerminal);
+            for (auto &rule : rules) {
+                newNT.addRule(rule);
+            }
+            nonTerminals.push_back(newNT);
         }
     }
-
     // Eliminates indirect left recursion: For a given nonterminal A and a previous nonterminal B
     void solveNonImmediateLR(NonTerminal &A, NonTerminal &B) {
         string nameA = A.getName();
